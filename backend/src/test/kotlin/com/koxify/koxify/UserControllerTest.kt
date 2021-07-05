@@ -37,7 +37,7 @@ class UserControllerTest {
     }
 
     @Test // methodName_condition_expectBehaviour
-    fun postUser_whenUserIsValid_receiveOk() {
+    fun `post valid user should receive Ok`() {
         val user = createValidUser()
 
         val response = testRestTemplate.postForEntity(API_1_0_USERS, user, Object::class.java)
@@ -45,7 +45,7 @@ class UserControllerTest {
     }
 
     @Test
-    fun postUser_whenUserIsValid_userSavedToDatabase() {
+    fun `post valid user should save to database`() {
         val user = createValidUser()
 
         testRestTemplate.postForEntity(API_1_0_USERS, user, Object::class.java)
@@ -53,11 +53,24 @@ class UserControllerTest {
     }
 
     @Test
-    fun postUser_whenUserIsValid_receiveSuccessMessage() {
+    fun `post valid user should receive success message`() {
         val user = createValidUser()
 
         val response: ResponseEntity<GenericResponse> = testRestTemplate.postForEntity(API_1_0_USERS, user, GenericResponse::class.java)
         Assertions.assertThat(response.body!!.message).isNotNull
+    }
+
+    @Test
+    fun `post valid user should password hashed in database`() {
+        // given
+        val user = createValidUser()
+
+        // when
+        testRestTemplate.postForEntity(API_1_0_USERS, user, Object::class.java)
+        val inDB = userRepository.findAll()[0]
+
+        // then
+        Assertions.assertThat(inDB.password).isNotEqualTo(user.password)
     }
 
     private fun createValidUser(): User {

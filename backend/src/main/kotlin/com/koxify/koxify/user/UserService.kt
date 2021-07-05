@@ -1,13 +1,17 @@
 package com.koxify.koxify.user
 
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 
 @Service
 class UserService(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val passwordEncoder: PasswordEncoder
 ) {
-
     fun saveUser(user: User): User {
-        return userRepository.save(user)
+        val encodedUser = user.let { it.copy(password = passwordEncoder.encode((user.password))) }
+        return userRepository.save(encodedUser)
     }
 }
