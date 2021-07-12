@@ -1,18 +1,12 @@
 import React, { ChangeEvent, SyntheticEvent } from "react";
 import { HighlightSpanKind } from "typescript";
+import { User } from "../api/apiCalls";
 
 export interface State {
     actions?: {
         postSignup: (user: User) => Promise<any>
     }
 }
-
-interface User {
-    username: string,
-    displayName: string,
-    password: string,
-}
-
 
 class UserSignUpPage extends React.Component<State> {
     static defaultProps = {
