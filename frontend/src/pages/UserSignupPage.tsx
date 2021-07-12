@@ -20,6 +20,7 @@ class UserSignUpPage extends React.Component<State> {
         username: '',
         password: '',
         passwordRepeat: '',
+        pendingApiCall: false
     }
 
 
@@ -49,8 +50,14 @@ class UserSignUpPage extends React.Component<State> {
             displayName: this.state.displayName,
             password: this.state.password,
         }
-
-        this.props.actions!.postSignup(user);
+        this.setState({ pendingApiCall: true });
+        this.props.actions!.postSignup(user)
+            .then(() => {
+                this.setState({ pendingApiCall: false })
+            })
+            .catch((error) => {
+                this.setState({ pendingApiCall: false })
+            });
     }
 
     render() {
@@ -96,7 +103,15 @@ class UserSignUpPage extends React.Component<State> {
                 <div className="text-center">
                     <button
                         className="btn btn-primary"
-                        onClick={this.onClickSignup}>Sign up
+                        onClick={this.onClickSignup}
+                        disabled={this.state.pendingApiCall}
+                    >
+                        {this.state.pendingApiCall && (
+                            <div className="spinner-border text-light spinner-border-sm mr-sm-1" role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
+                        )}
+                        Sign up
                     </button>
                 </div>
             </div>
