@@ -1,10 +1,16 @@
 import React, { ChangeEvent, SyntheticEvent } from "react";
 import { HighlightSpanKind } from "typescript";
 
-interface State {
+export interface State {
     actions?: {
-        postSignup: () => Promise<any>
+        postSignup: (user: User) => Promise<any>
     }
+}
+
+interface User {
+    username: string,
+    displayName: string,
+    password: string,
 }
 
 
@@ -44,9 +50,13 @@ class UserSignUpPage extends React.Component<State> {
     }
 
     onClickSignup = () => {
-        if (this.props.actions) {
-            this.props.actions.postSignup();
+        const user: User = {
+            username: this.state.username,
+            displayName: this.state.displayName,
+            password: this.state.password,
         }
+
+        this.props.actions!.postSignup(user);
     }
 
     render() {
