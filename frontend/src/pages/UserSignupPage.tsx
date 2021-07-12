@@ -1,9 +1,19 @@
 import React, { ChangeEvent, SyntheticEvent } from "react";
+import { HighlightSpanKind } from "typescript";
 
 interface State {
+    actions?: {
+        postSignup: () => Promise<any>
+    }
 }
 
+
 class UserSignUpPage extends React.Component<State> {
+    static defaultProps = {
+        actions: {
+            postSignup: () => Promise.resolve({})
+        }
+    }
 
     state = {
         displayName: '',
@@ -11,6 +21,7 @@ class UserSignUpPage extends React.Component<State> {
         password: '',
         passwordRepeat: '',
     }
+
 
     onChangeDisplayName = (event: React.FormEvent<HTMLInputElement>) => {
         const value = event.currentTarget.value;
@@ -30,6 +41,12 @@ class UserSignUpPage extends React.Component<State> {
     onChangePasswordRepeat = (event: React.FormEvent<HTMLInputElement>) => {
         const value = event.currentTarget.value;
         this.setState({ passwordRepeat: value })
+    }
+
+    onClickSignup = () => {
+        if (this.props.actions) {
+            this.props.actions.postSignup();
+        }
     }
 
     render() {
@@ -61,7 +78,7 @@ class UserSignUpPage extends React.Component<State> {
                     />
                 </div>
                 <div>
-                    <button>Sign up</button>
+                    <button onClick={this.onClickSignup}>Sign up</button>
                 </div>
             </div>
         )
