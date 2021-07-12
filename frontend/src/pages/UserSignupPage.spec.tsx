@@ -1,5 +1,5 @@
 import React from "react";
-import { render, cleanup } from '@testing-library/react'
+import { render, cleanup, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import UserSignUpPage from "./UserSignupPage";
 
@@ -46,6 +46,53 @@ describe('UserSignupPage', () => {
             const { container } = render(<UserSignUpPage />)
             const button = container.querySelector('button')
             expect(button).toBeInTheDocument()
+        })
+
+    })
+
+    describe('Interaction', () => {
+        const changeEvent = (content: string) => {
+            return {
+                target: {
+                    value: content
+                }
+            }
+        }
+
+        it('sets the desplayName value into state', () => {
+            const { queryByPlaceholderText } = render(<UserSignUpPage />)
+            const displayNameInput = queryByPlaceholderText('Your display name') as HTMLElement
+
+            fireEvent.change(displayNameInput, changeEvent('my-display-name'));
+
+            expect(displayNameInput).toHaveValue('my-display-name');
+        })
+
+        it('sets the username value into state', () => {
+            const { queryByPlaceholderText } = render(<UserSignUpPage />)
+            const displayNameInput = queryByPlaceholderText('Your username') as HTMLElement
+
+            fireEvent.change(displayNameInput, changeEvent('my-username'));
+
+            expect(displayNameInput).toHaveValue('my-username');
+        })
+
+        it('sets the password value into state', () => {
+            const { queryByPlaceholderText } = render(<UserSignUpPage />)
+            const displayNameInput = queryByPlaceholderText('Your password') as HTMLElement
+
+            fireEvent.change(displayNameInput, changeEvent('my-password'));
+
+            expect(displayNameInput).toHaveValue('my-password');
+        })
+
+        it('sets the password repeat value into state', () => {
+            const { queryByPlaceholderText } = render(<UserSignUpPage />)
+            const displayNameInput = queryByPlaceholderText('Your password repeat') as HTMLElement
+
+            fireEvent.change(displayNameInput, changeEvent('my-password-repeat'));
+
+            expect(displayNameInput).toHaveValue('my-password-repeat');
         })
 
     })
