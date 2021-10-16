@@ -20,19 +20,12 @@ import org.springframework.test.context.TestPropertySource
     properties =
     ["spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration"]
 )
-class UserControllerTest {
-
-    @Autowired
-    private lateinit var testRestTemplate: TestRestTemplate
-    @Autowired
-    private lateinit var  userRepository: UserRepository
-
+class UserControllerTest(
+        @Autowired val testRestTemplate: TestRestTemplate,
+        @Autowired val userRepository: UserRepository
+) {
     @BeforeEach
-    internal fun setUp() {
-    }
-
-    @AfterEach
-    internal fun tearDown() {
+    internal fun cleanup() {
         userRepository.deleteAll()
     }
 
@@ -40,7 +33,7 @@ class UserControllerTest {
     fun `post valid user should receive Ok`() {
         val user = createValidUser()
 
-        val response = testRestTemplate.postForEntity(API_1_0_USERS, user, Object::class.java)
+        val response = postSignup(user, Object::class.java)
         Assertions.assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
     }
 
@@ -48,7 +41,7 @@ class UserControllerTest {
     fun `post valid user should save to database`() {
         val user = createValidUser()
 
-        testRestTemplate.postForEntity(API_1_0_USERS, user, Object::class.java)
+        postSignup(user, Object::class.java)
         Assertions.assertThat(userRepository.count()).isEqualTo(1)
     }
 
@@ -56,8 +49,8 @@ class UserControllerTest {
     fun `post valid user should receive success message`() {
         val user = createValidUser()
 
-        val response: ResponseEntity<GenericResponse> = testRestTemplate.postForEntity(API_1_0_USERS, user, GenericResponse::class.java)
-        Assertions.assertThat(response.body!!.message).isNotNull
+        val response: ResponseEntity<GenericResponse> = postSignup(user, GenericResponse::class.java)
+        Assertions.assertThat(response.body?.message).isNotNull
     }
 
     @Test
@@ -66,20 +59,43 @@ class UserControllerTest {
         val user = createValidUser()
 
         // when
-        testRestTemplate.postForEntity(API_1_0_USERS, user, Object::class.java)
+        postSignup(user, Any::class.java)
         val inDB = userRepository.findAll()[0]
 
         // then
         Assertions.assertThat(inDB.password).isNotEqualTo(user.password)
     }
 
+    @Test
+    fun `post user with empty username should receive bad request`() {
+        // given
+        val user = createValidUser().copy(username = "")
+        // when
+        val response = postSignup(user, Any::class.java)
+        // then
+        Assertions.assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+    }
+
+    @Test
+    fun `post user with empty display name should receive bad request`() {
+        // given
+        val user = createValidUser().copy(displayName = "")
+        // when
+        val response = postSignup(user, Any::class.java)
+        // then
+        Assertions.assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+    }
+
+    fun <T>postSignup(request: Any, response: Class<T>): ResponseEntity<T> {
+        return testRestTemplate.postForEntity(API_1_0_USERS, request, response)
+    }
+
     private fun createValidUser(): User {
-        val user = User(
+        return User(
             username = "test-user",
             displayName = ("test-display"),
             password = ("test-password")
         )
-        return user
     }
 
     companion object {

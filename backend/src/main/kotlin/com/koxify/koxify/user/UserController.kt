@@ -10,10 +10,13 @@ import org.springframework.web.bind.annotation.RestController
 class UserController {
 
     @Autowired
-    lateinit private var userService: UserService
+    private lateinit var userService: UserService
 
     @PostMapping("/api/1.0/users")
     fun createUser(@RequestBody user: User): GenericResponse {
+        if (user.username.isBlank() || user.displayName.isBlank() ) {
+            throw UserNotValidException()
+        }
         userService.saveUser(user)
         return GenericResponse("User saved")
     }
