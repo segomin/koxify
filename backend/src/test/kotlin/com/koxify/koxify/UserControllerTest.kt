@@ -96,6 +96,99 @@ class UserControllerTest(
         Assertions.assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
     }
 
+    @Test
+    fun `post user with username less than required, should receive bad request`() {
+        // given
+        val user = createValidUser().copy(username = "abc")
+        // when
+        val response = postSignup(user, Any::class.java)
+        // then
+        Assertions.assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+    }
+
+    @Test
+    fun `post user with displayname less than required, should receive bad request`() {
+        // given
+        val user = createValidUser().copy(displayName = "abc")
+        // when
+        val response = postSignup(user, Any::class.java)
+        // then
+        Assertions.assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+    }
+
+    @Test
+    fun `post user with password less than required, should receive bad request`() {
+        // given
+        val user = createValidUser().copy(password = "P4sswd")
+        // when
+        val response = postSignup(user, Any::class.java)
+        // then
+        Assertions.assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+    }
+
+    @Test
+    fun `post user with username exceeds the limit length, should receive bad request`() {
+        // given
+        val valueOf256Char = (1..256).map { 'a' }.joinToString("")
+        val user = createValidUser().copy(username = valueOf256Char)
+        // when
+        val response = postSignup(user, Any::class.java)
+        // then
+        Assertions.assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+    }
+
+    @Test
+    fun `post user with display exceeds the limit length, should receive bad request`() {
+        // given
+        val valueOf256Char = (1..256).map { 'a' }.joinToString("")
+        val user = createValidUser().copy(displayName = valueOf256Char)
+        // when
+        val response = postSignup(user, Any::class.java)
+        // then
+        Assertions.assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+    }
+
+    @Test
+    fun `post user with password exceeds the limit length, should receive bad request`() {
+        // given
+        val valueOf256Char = (1..256).map { 'a' }.joinToString("")
+        val user = createValidUser().copy(password = valueOf256Char + "A1")
+        // when
+        val response = postSignup(user, Any::class.java)
+        // then
+        Assertions.assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+    }
+
+    @Test
+    fun `post user with password all lowercase, should receive bad request`() {
+        // given
+        val user = createValidUser().copy(password = "alllowercase")
+        // when
+        val response = postSignup(user, Any::class.java)
+        // then
+        Assertions.assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+    }
+
+    @Test
+    fun `post user with password all uppercase, should receive bad request`() {
+        // given
+        val user = createValidUser().copy(password = "ALLLOWERCASE")
+        // when
+        val response = postSignup(user, Any::class.java)
+        // then
+        Assertions.assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+    }
+
+    @Test
+    fun `post user with password all number, should receive bad request`() {
+        // given
+        val user = createValidUser().copy(password = "123456789")
+        // when
+        val response = postSignup(user, Any::class.java)
+        // then
+        Assertions.assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+    }
+
     fun <T>postSignup(request: Any, response: Class<T>): ResponseEntity<T> {
         return testRestTemplate.postForEntity(API_1_0_USERS, request, response)
     }
@@ -104,7 +197,7 @@ class UserControllerTest(
         return User(
             username = "test-user",
             displayName = ("test-display"),
-            password = ("test-password")
+            password = ("P4ssword")
         )
     }
 
