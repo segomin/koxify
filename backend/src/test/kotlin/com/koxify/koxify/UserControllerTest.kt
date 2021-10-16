@@ -86,6 +86,16 @@ class UserControllerTest(
         Assertions.assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
     }
 
+    @Test
+    fun `post user with empty password should receive bad request`() {
+        // given
+        val user = createValidUser().copy(password = "")
+        // when
+        val response = postSignup(user, Any::class.java)
+        // then
+        Assertions.assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+    }
+
     fun <T>postSignup(request: Any, response: Class<T>): ResponseEntity<T> {
         return testRestTemplate.postForEntity(API_1_0_USERS, request, response)
     }
