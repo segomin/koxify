@@ -1,5 +1,6 @@
 package com.koxify.koxify
 
+import com.koxify.koxify.error.ApiError
 import com.koxify.koxify.shared.GenericResponse
 import com.koxify.koxify.user.User
 import com.koxify.koxify.user.UserRepository
@@ -187,6 +188,26 @@ class UserControllerTest(
         val response = postSignup(user, Any::class.java)
         // then
         Assertions.assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+    }
+
+    @Test
+    fun `post user with invalid user, should receive apiError`() {
+        // given
+        val user = User(username = "", displayName = "", password = "")
+        // when
+        val response = postSignup(user, ApiError::class.java)
+        // then
+        Assertions.assertThat(response.body?.url).isEqualTo(API_1_0_USERS)
+    }
+
+    @Test
+    fun `post user with invalid user, should receive apiError with Validation errors`() {
+        // given
+        val user = User(username = "", displayName = "", password = "")
+        // when
+        val response = postSignup(user, ApiError::class.java)
+        // then
+        Assertions.assertThat(response.body?.validationErrors?.size).isEqualTo(3)
     }
 
     fun <T>postSignup(request: Any, response: Class<T>): ResponseEntity<T> {
